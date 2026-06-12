@@ -6,6 +6,7 @@ from agent import run
 
 st.set_page_config(page_title="Jobs AI Assistant", layout="wide")
 
+import sys
 import subprocess
 import time
 from pathlib import Path
@@ -28,7 +29,7 @@ if not check_server():
     if (server_dir / "main.py").exists():
         try:
             subprocess.Popen(
-                ["uvicorn", "main:app", "--port", "8000"],
+                [sys.executable, "-m", "uvicorn", "main:app", "--port", "8000"],
                 cwd=str(server_dir),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
