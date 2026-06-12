@@ -9,7 +9,7 @@ SYSTEM_PROMPT = (
 )
 
 
-async def run(query: str) -> tuple[str, list[dict]]:
+async def run(query: str, model_name: str = "claude-3-5-sonnet-20241022") -> tuple[str, list[dict]]:
     tool_call_log: list[dict] = []
     try:
         async with sse_client(MCP_SERVER_URL) as (read, write):
@@ -31,7 +31,7 @@ async def run(query: str) -> tuple[str, list[dict]]:
 
                 while True:
                     response = client.messages.create(
-                        model="claude-3-5-sonnet-latest",
+                        model=model_name,
                         max_tokens=4096,
                         system=SYSTEM_PROMPT,
                         tools=anthropic_tools,

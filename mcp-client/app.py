@@ -72,6 +72,21 @@ else:
         else:
             st.warning("⚠️ Uvicorn background process initiated, but the log file is empty. Check if port 8000 is occupied.")
 
+# Sidebar configuration panel
+with st.sidebar:
+    st.title("Settings ⚙️")
+    model_name = st.selectbox(
+        "Claude Model Selection",
+        options=[
+            "claude-3-5-sonnet-20241022",
+            "claude-3-5-sonnet-20240620",
+            "claude-3-5-haiku-20241022",
+            "claude-3-opus-20240229",
+        ],
+        index=0,
+        help="Select the exact Anthropic Claude model version to use."
+    )
+
 left, right = st.columns(2, gap="large")
 
 with left:
@@ -85,7 +100,7 @@ with left:
 
     if ask_clicked and query:
         with st.spinner("Agent thinking..."):
-            response_text, tool_log = asyncio.run(run(query))
+            response_text, tool_log = asyncio.run(run(query, model_name=model_name))
         st.session_state["response_text"] = response_text
         st.session_state["tool_log"] = tool_log
 
