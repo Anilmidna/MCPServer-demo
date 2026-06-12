@@ -152,14 +152,24 @@ with tab2:
         # Configure Mock Tool
         tool_choice = st.selectbox(
             "Select Server-Side Tool to Expose:",
-            options=["Weather API", "Jobs Database Search"],
-            index=0 if st.session_state["sim_tool"] == "Weather API" else 1,
+            options=["Weather API", "Jobs Database Search", "Calculator (Math API)", "Todo List Manager"],
+            index=0 if st.session_state["sim_tool"] == "Weather API" else 
+                  (1 if st.session_state["sim_tool"] == "Jobs Database Search" else 
+                  (2 if st.session_state["sim_tool"] == "Calculator (Math API)" else 3)),
             on_change=reset_sim
         )
         st.session_state["sim_tool"] = tool_choice
         
         # Configure Query
-        default_query = "What's the weather like in Chennai?" if tool_choice == "Weather API" else "Find me Data Engineer jobs in Bangalore"
+        if tool_choice == "Weather API":
+            default_query = "What's the weather like in Chennai?"
+        elif tool_choice == "Jobs Database Search":
+            default_query = "Find me Data Engineer jobs in Bangalore"
+        elif tool_choice == "Calculator (Math API)":
+            default_query = "What is 345 times 12?"
+        else:
+            default_query = "Add 'Prepare GenAI DE Presentation' to my todo list"
+            
         query_val = st.text_input("User Prompt:", value=default_query)
         if query_val != st.session_state["sim_query"]:
             st.session_state["sim_query"] = query_val
@@ -223,7 +233,7 @@ with tab2:
                             "required": ["city"]
                         }
                     }]
-                else:
+                elif tool_choice == "Jobs Database Search":
                     tools_list = [{
                         "name": "search_jobs",
                         "description": "Search jobs database by keyword and location",
@@ -234,6 +244,30 @@ with tab2:
                                 "location": {"type": "string", "description": "City filter"}
                             },
                             "required": ["query"]
+                        }
+                    }]
+                elif tool_choice == "Calculator (Math API)":
+                    tools_list = [{
+                        "name": "calculate",
+                        "description": "Evaluate a mathematical expression",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "expression": {"type": "string", "description": "Math equation to solve (e.g. 345 * 12)"}
+                            },
+                            "required": ["expression"]
+                        }
+                    }]
+                else:
+                    tools_list = [{
+                        "name": "add_todo_item",
+                        "description": "Add a new task item to your personal todo list",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "item": {"type": "string", "description": "The description of the task to add"}
+                            },
+                            "required": ["item"]
                         }
                     }]
                 
@@ -266,9 +300,19 @@ with tab2:
                 if tool_choice == "Weather API":
                     tool_args = {"city": "chennai"}
                     tool_output = MOCK_WEATHER_DB["chennai"]
-                else:
+                    tool_name_real = "get_weather"
+                elif tool_choice == "Jobs Database Search":
                     tool_args = {"query": "Data Engineer", "location": "Bangalore"}
-                    tool_output = [MOCK_JOBS_DB[0]] # Data Engineer in Bangalore
+                    tool_output = [MOCK_JOBS_DB[0]]
+                    tool_name_real = "search_jobs"
+                elif tool_choice == "Calculator (Math API)":
+                    tool_args = {"expression": "345 * 12"}
+                    tool_output = {"result": 4140}
+                    tool_name_real = "calculate"
+                else:
+                    tool_args = {"item": "Prepare GenAI DE Presentation"}
+                    tool_output = {"success": True, "updated_list": ["Prepare GenAI DE Presentation", "Review database schema"]}
+                    tool_name_real = "add_todo_item"
                     
                 st.session_state["sim_logs"].append({
                     "direction": "Client ➡️ Server",
@@ -278,7 +322,7 @@ with tab2:
                         "id": 3,
                         "method": "tools/call",
                         "params": {
-                            "name": "get_weather" if tool_choice == "Weather API" else "search_jobs",
+                            "name": tool_name_real,
                             "arguments": tool_args
                         }
                     }
@@ -329,15 +373,19 @@ with tab2:
             # If tool has been called
             if step >= 3:
                 with st.chat_message("assistant", avatar="⚙️"):
-                    st.markdown(f"**Tool Invocation Request:** Calling `{ 'get_weather' if tool_choice == 'Weather API' else 'search_jobs' }`...")
+                    st.markdown(f"**Tool Invocation Request:** Calling `{ 'get_weather' if tool_choice == 'Weather API' else ('search_jobs' if tool_choice == 'Jobs Database Search' else ('calculate' if tool_choice == 'Calculator (Math API)' else 'add_todo_item')) }`...")
 
             # Final response
             if step == 4:
                 with st.chat_message("assistant", avatar="🤖"):
                     if tool_choice == "Weather API":
                         st.markdown("☀️ The weather in Chennai is currently **34°C** with **Humid & Cloudy** conditions and a relative humidity of 85%.")
-                    else:
+                    elif tool_choice == "Jobs Database Search":
                         st.markdown("💼 I found a **Data Engineer** job posting at **TechCorp** located in **Bangalore** with a salary of **18 LPA**.")
+                    elif tool_choice == "Calculator (Math API)":
+                        st.markdown("🧮 I evaluated the expression `345 * 12`. The result is **4,140**.")
+                    else:
+                        st.markdown("✅ I have added **'Prepare GenAI DE Presentation'** to your todo list. Your updated list has 2 items: \n1. Prepare GenAI DE Presentation\n2. Review database schema")
                 
     with col_wire:
         st.subheader("📡 MCP Wire Protocol logs")
