@@ -4,3 +4,5 @@ mcp[cli]
 requests
 pytest
 pytest-asyncio
+fastapi
+uvicorn[standard]

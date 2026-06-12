@@ -158,7 +158,7 @@ run(query)
   2. Initialize MCP session
   3. Call list_tools() → get tool definitions (name, description, inputSchema)
   4. Convert MCP tools to Anthropic tool format
-  5. Send query + tools to Claude (claude-sonnet-4-6)
+  5. Send query + tools to Claude (claude-3-5-sonnet-latest)
   6. If stop_reason == "tool_use":
        → call session.call_tool(name, input) for each tool_use block
        → append tool results to messages
@@ -197,7 +197,7 @@ Claude returns `stop_reason = "tool_use"` when it wants to call a tool. The agen
 
 ```python
 while True:
-    response = client.messages.create(model="claude-sonnet-4-6", ...)
+     response = client.messages.create(model="claude-3-5-sonnet-latest", ...)
 
     if response.stop_reason == "tool_use":
         tool_uses = [b for b in response.content if b.type == "tool_use"]

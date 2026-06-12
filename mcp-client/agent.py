@@ -31,7 +31,7 @@ async def run(query: str) -> tuple[str, list[dict]]:
 
                 while True:
                     response = client.messages.create(
-                        model="claude-sonnet-4-6",
+                        model="claude-3-5-sonnet-latest",
                         max_tokens=4096,
                         system=SYSTEM_PROMPT,
                         tools=anthropic_tools,

@@ -6,6 +6,10 @@ from agent import run
 
 st.set_page_config(page_title="Jobs AI Assistant", layout="wide")
 
+import subprocess
+import time
+from pathlib import Path
+
 MCP_HEALTH_URL = "http://localhost:8000/health"
 
 
@@ -16,6 +20,25 @@ def check_server() -> bool:
         return r.status_code == 200
     except Exception:
         return False
+
+
+# Auto-start FastAPI backend if offline (for Streamlit Cloud or single-process local run)
+if not check_server():
+    server_dir = Path(__file__).resolve().parent.parent / "mcp-server"
+    if (server_dir / "main.py").exists():
+        try:
+            subprocess.Popen(
+                ["uvicorn", "main:app", "--port", "8000"],
+                cwd=str(server_dir),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            # Give the server 3 seconds to spin up
+            time.sleep(3)
+            # Clear Streamlit cache to force a fresh health check check
+            st.cache_data.clear()
+        except Exception as e:
+            st.sidebar.error(f"Failed to auto-start backend server: {e}")
 
 
 st.title("Jobs AI Assistant")
