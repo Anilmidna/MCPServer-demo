@@ -121,6 +121,14 @@ with tab1:
         """)
         st.markdown('</div>', unsafe_allow_html=True)
 
+    # Centered user custom image below columns
+    st.divider()
+    mcp_png_path = Path(__file__).resolve().parent.parent / "MCP.png"
+    if mcp_png_path.exists():
+        col_img_left, col_img_center, col_img_right = st.columns([1, 4, 1])
+        with col_img_center:
+            st.image(str(mcp_png_path), caption="Model Context Protocol Workflow", use_container_width=True)
+
 
 # ==========================================================
 # TAB 2: INTERACTIVE PLAYGROUND / SIMULATOR
