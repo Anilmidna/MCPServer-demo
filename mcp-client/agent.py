@@ -70,4 +70,5 @@ async def run(query: str) -> tuple[str, list[dict]]:
                         return final_text, tool_call_log
 
     except Exception as exc:
-        return "", [{"error": f"MCP server offline or error: {exc}"}]
+        import traceback
+        return "", [{"error": f"MCP server offline or error:\n{traceback.format_exc()}"}]
