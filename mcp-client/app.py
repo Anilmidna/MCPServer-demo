@@ -105,7 +105,14 @@ with tab1:
     with col2:
         st.markdown('<div class="mcp-card">', unsafe_allow_html=True)
         st.markdown("### 🏛️ The Three-Agent Architecture")
-        st.image("https://modelcontextprotocol.io/img/architecture.png", caption="MCP Architecture (Host, Client, Server)", use_container_width=True)
+        
+        # Resolve path to the generated diagram
+        img_path = Path(__file__).resolve().parent.parent / "mcp_architecture.png"
+        if img_path.exists():
+            st.image(str(img_path), caption="MCP Architecture Flow Diagram", use_container_width=True)
+        else:
+            st.image("https://modelcontextprotocol.io/img/architecture.png", caption="MCP Architecture (Host, Client, Server)", use_container_width=True)
+            
         st.markdown("""
         * **Host**: Application where the user interacts (like Claude Desktop or this Streamlit UI).
         * **Client**: The library maintaining connection to servers and handling the LLM conversation loop.
