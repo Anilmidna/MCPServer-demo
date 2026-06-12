@@ -306,21 +306,30 @@ with tab2:
                 st.rerun()
 
         # Display UI response matching current step
-        st.subheader("💡 Host/UI View")
+        st.subheader("💡 Host/UI Chat Preview")
         if step >= 1:
-            st.success("🟢 MCP Connected: localhost:8000")
+            st.success("🟢 MCP Session Active (Simulated)")
         else:
-            st.error("🔴 MCP Session Not Initialized")
-            
-        st.text_area("User Query", value=st.session_state["sim_query"], disabled=True)
-        
-        if step == 4:
-            if tool_choice == "Weather API":
-                st.write("**Agent Response:**")
-                st.info("☀️ The weather in Chennai is currently **34°C** with **Humid & Cloudy** conditions and a relative humidity of 85%.")
-            else:
-                st.write("**Agent Response:**")
-                st.info("💼 I found a **Data Engineer** job posting at **TechCorp** located in **Bangalore** with a salary of **18 LPA**.")
+            st.info("⚪ Connection ready. Click '1. Initialize Handshake' above.")
+
+        # Show a real-looking chat bubble sequence representing the LLM + Client state
+        with st.container(border=True):
+            # User Prompt
+            with st.chat_message("user"):
+                st.write(st.session_state["sim_query"])
+
+            # If tool has been called
+            if step >= 3:
+                with st.chat_message("assistant", avatar="⚙️"):
+                    st.markdown(f"**Tool Invocation Request:** Calling `{ 'get_weather' if tool_choice == 'Weather API' else 'search_jobs' }`...")
+
+            # Final response
+            if step == 4:
+                with st.chat_message("assistant", avatar="🤖"):
+                    if tool_choice == "Weather API":
+                        st.markdown("☀️ The weather in Chennai is currently **34°C** with **Humid & Cloudy** conditions and a relative humidity of 85%.")
+                    else:
+                        st.markdown("💼 I found a **Data Engineer** job posting at **TechCorp** located in **Bangalore** with a salary of **18 LPA**.")
                 
     with col_wire:
         st.subheader("📡 MCP Wire Protocol logs")
