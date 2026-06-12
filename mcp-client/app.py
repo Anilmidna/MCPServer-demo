@@ -30,9 +30,7 @@ if not check_server():
         try:
             subprocess.Popen(
                 [sys.executable, "-m", "uvicorn", "main:app", "--port", "8000"],
-                cwd=str(server_dir),
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                cwd=str(server_dir)
             )
             # Give the server 3 seconds to spin up
             time.sleep(3)
