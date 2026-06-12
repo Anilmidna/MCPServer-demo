@@ -1,7 +1,16 @@
+import os
+import streamlit as st
+
+# Inject Streamlit secrets into environment variables so SDKs can discover them
+try:
+    for key in st.secrets:
+        os.environ[key] = str(st.secrets[key])
+except Exception:
+    pass
+
 import asyncio
 import json
 import requests
-import streamlit as st
 from agent import run
 
 st.set_page_config(page_title="Jobs AI Assistant", layout="wide")
