@@ -24,16 +24,22 @@ def check_server() -> bool:
 
 
 # Auto-start FastAPI backend if offline (for Streamlit Cloud or single-process local run)
+server_dir = Path(__file__).resolve().parent.parent / "mcp-server"
+log_path = server_dir / "uvicorn.log"
+
 if not check_server():
-    server_dir = Path(__file__).resolve().parent.parent / "mcp-server"
     if (server_dir / "main.py").exists():
         try:
-            subprocess.Popen(
-                [sys.executable, "-m", "uvicorn", "main:app", "--port", "8000"],
-                cwd=str(server_dir)
-            )
-            # Give the server 3 seconds to spin up
-            time.sleep(3)
+            # We open the log file to capture standard output/error from uvicorn
+            with open(log_path, "w") as log_file:
+                subprocess.Popen(
+                    [sys.executable, "-m", "uvicorn", "main:app", "--port", "8000"],
+                    cwd=str(server_dir),
+                    stdout=log_file,
+                    stderr=log_file
+                )
+            # Give the server 4 seconds to spin up
+            time.sleep(4)
             # Clear Streamlit cache to force a fresh health check check
             st.cache_data.clear()
         except Exception as e:
@@ -47,7 +53,15 @@ server_ok = check_server()
 if server_ok:
     st.success("🟢  MCP Server connected · localhost:8000")
 else:
-    st.error("🔴  MCP Server offline · start App A first: `uvicorn main:app --port 8000`")
+    st.error("🔴  MCP Server offline")
+    if log_path.exists():
+        with open(log_path, "r") as log_file:
+            log_content = log_file.read()
+        if log_content:
+            st.warning("⚠️ FastAPI Background Server Logs:")
+            st.code(log_content)
+        else:
+            st.warning("⚠️ Uvicorn background process initiated, but the log file is empty. Check if port 8000 is occupied.")
 
 left, right = st.columns(2, gap="large")
 
