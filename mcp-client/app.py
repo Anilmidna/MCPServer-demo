@@ -61,7 +61,7 @@ st.caption("An interactive playground to learn, simulate, and practice LLM-to-to
 
 # Sidebar Information
 with st.sidebar:
-    st.image("https://raw.githubusercontent.com/modelcontextprotocol/mcp/main/logo.png", width=80, errors="ignore")
+    st.image("https://raw.githubusercontent.com/modelcontextprotocol/mcp/main/logo.png", width=80)
     st.header("MCP Quick Ref 📝")
     st.markdown("""
     * **Host**: The orchestrator (e.g., Claude Desktop, Streamlit client).
@@ -105,7 +105,7 @@ with tab1:
     with col2:
         st.markdown('<div class="mcp-card">', unsafe_allow_html=True)
         st.markdown("### 🏛️ The Three-Agent Architecture")
-        st.image("https://modelcontextprotocol.io/img/architecture.png", caption="MCP Architecture (Host, Client, Server)", use_container_width=True, errors="ignore")
+        st.image("https://modelcontextprotocol.io/img/architecture.png", caption="MCP Architecture (Host, Client, Server)", use_container_width=True)
         st.markdown("""
         * **Host**: Application where the user interacts (like Claude Desktop or this Streamlit UI).
         * **Client**: The library maintaining connection to servers and handling the LLM conversation loop.
